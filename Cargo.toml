@@ -16,5 +16,5 @@ members = [
 	"primitives/rpc",
 	"template/node",
 	"template/runtime",
-	"template/test-utils/client",
+	# "template/test-utils/client",
 ]

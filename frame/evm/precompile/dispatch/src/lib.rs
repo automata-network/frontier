@@ -27,12 +27,12 @@ use frame_support::{dispatch::{Dispatchable, GetDispatchInfo, PostDispatchInfo},
 use pallet_evm::{AddressMapping, GasWeightMapping};
 use codec::Decode;
 
-pub struct Dispatch<T: pallet_evm::Config> {
+pub struct Dispatch<T: pallet_evm::Trait> {
 	_marker: PhantomData<T>,
 }
 
 impl<T> Precompile for Dispatch<T> where
-	T: pallet_evm::Config,
+	T: pallet_evm::Trait,
 	T::Call: Dispatchable<PostInfo=PostDispatchInfo> + GetDispatchInfo + Decode,
 	<T::Call as Dispatchable>::Origin: From<Option<T::AccountId>>,
 {

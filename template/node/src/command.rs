@@ -100,7 +100,7 @@ pub fn run() -> sc_cli::Result<()> {
 		},
 		None => {
 			let runner = cli.create_runner(&cli.run.base)?;
-			runner.run_node_until_exit(|config| async move {
+			runner.run_node_until_exit(|config| {
 				match config.role {
 					Role::Light => service::new_light(config),
 					_ => service::new_full(config, cli.run.sealing, cli.run.enable_dev_signer),
