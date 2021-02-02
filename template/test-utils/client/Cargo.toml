@@ -8,11 +8,11 @@ license = "GPL-3.0"
 
 [dependencies]
 codec = { package = "parity-scale-codec", version = "1.3.1" }
-sp-runtime = { version = "2.0.0" }
-sp-api = { version = "2.0.0" }
-sc-executor = { version = "0.8.0" }
-sc-light = { version = "2.0.0" }
-sc-consensus = { version = "0.8.0" }
-sc-client-api = { version = "2.0.0" }
-substrate-test-client = { version = "2.0.0" }
+sp-runtime = { git = "https://github.com/paritytech/substrate.git", rev = "4888ac68c8f451b5843ff17135a34ae0f137dabc" }
+sp-api = { git = "https://github.com/paritytech/substrate.git", rev = "4888ac68c8f451b5843ff17135a34ae0f137dabc" }
+sc-executor = { git = "https://github.com/paritytech/substrate.git", rev = "4888ac68c8f451b5843ff17135a34ae0f137dabc" }
+sc-light = { git = "https://github.com/paritytech/substrate.git", rev = "4888ac68c8f451b5843ff17135a34ae0f137dabc" }
+sc-consensus = { git = "https://github.com/paritytech/substrate.git", rev = "4888ac68c8f451b5843ff17135a34ae0f137dabc" }
+sc-client-api = { git = "https://github.com/paritytech/substrate.git", rev = "4888ac68c8f451b5843ff17135a34ae0f137dabc" }
+substrate-test-client = { git = "https://github.com/paritytech/substrate.git", rev = "4888ac68c8f451b5843ff17135a34ae0f137dabc" }
 frontier-template-runtime = { path = "../../runtime" }
