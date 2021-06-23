@@ -19,9 +19,10 @@
 
 use super::*;
 use crate::{Module, Config, IntermediateStateRoot};
+use crate as eth_module;
 use ethereum::{TransactionAction, TransactionSignature};
 use frame_support::{
-	impl_outer_origin, parameter_types, ConsensusEngineId
+	parameter_types, ConsensusEngineId
 };
 use pallet_evm::{FeeCalculator, AddressMapping, EnsureAddressTruncated};
 use rlp::*;
@@ -35,6 +36,18 @@ use sp_runtime::AccountId32;
 
 impl_outer_origin! {
 	pub enum Origin for Test where system = frame_system {}
+}
+
+pub struct PalletInfo;
+
+impl frame_support::traits::PalletInfo for PalletInfo {
+	fn index<P: 'static>() -> Option<usize> {
+		return Some(0)
+	}
+
+	fn name<P: 'static>() -> Option<&'static str> {
+		return Some("TestName")
+	}
 }
 
 // For testing the pallet, we construct most of a mock runtime. This means
@@ -56,7 +69,7 @@ impl frame_system::Config for Test {
 	type Index = u64;
 	type BlockNumber = u64;
 	type Hash = H256;
-	type Call = ();
+	type Call = Call;
 	type Hashing = BlakeTwo256;
 	type AccountId = AccountId32;
 	type Lookup = IdentityLookup<Self::AccountId>;
@@ -64,7 +77,7 @@ impl frame_system::Config for Test {
 	type Event = ();
 	type BlockHashCount = BlockHashCount;
 	type Version = ();
-	type PalletInfo = ();
+	type PalletInfo = PalletInfo;
 	type AccountData = pallet_balances::AccountData<u64>;
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
@@ -120,6 +133,7 @@ parameter_types! {
 	pub const TransactionByteFee: u64 = 1;
 	pub const ChainId: u64 = 42;
 	pub const EVMModuleId: ModuleId = ModuleId(*b"py/evmpa");
+	pub const BlockGasLimit: U256 = U256::MAX;
 }
 
 pub struct HashedAddressMapping;
@@ -129,6 +143,10 @@ impl AddressMapping<AccountId32> for HashedAddressMapping {
 		let mut data = [0u8; 32];
 		data[0..20].copy_from_slice(&address[..]);
 		AccountId32::from(Into::<[u8; 32]>::into(data))
+	}
+
+	fn to_evm_address(account_id: &AccountId32) -> Option<H160> {
+		None
 	}
 }
 
@@ -142,24 +160,38 @@ impl pallet_evm::Config for Test {
 	type Event = ();
 	type Precompiles = ();
 	type Runner = pallet_evm::runner::stack::Runner<Self>;
+	// type BanlistChecker = ();
 	type ChainId = ChainId;
-}
-
-parameter_types! {
-	pub const BlockGasLimit: U256 = U256::MAX;
+	type BlockGasLimit = BlockGasLimit;
+	type OnChargeTransaction = ();
 }
 
 impl Config for Test {
 	type Event = ();
 	type FindAuthor = EthereumFindAuthor;
 	type StateRoot = IntermediateStateRoot;
-	type BlockGasLimit = BlockGasLimit;
 }
 
-pub type System = frame_system::Module<Test>;
-pub type Balances = pallet_balances::Module<Test>;
-pub type Ethereum = Module<Test>;
-pub type Evm = pallet_evm::Module<Test>;
+//pub type System = frame_system::Module<Test>;
+//pub type Balances = pallet_balances::Module<Test>;
+//pub type Ethereum = Module<Test>;
+//pub type Evm = pallet_evm::Module<Test>;
+type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
+type Block = frame_system::mocking::MockBlock<Test>;
+
+frame_support::construct_runtime!(
+	pub enum Test where
+		Block = Block,
+		NodeBlock = Block,
+		UncheckedExtrinsic = UncheckedExtrinsic
+	{
+		System: frame_system::{Module, Call, Config, Storage, Event<T>},
+		Balances: pallet_balances::{Module, Call, Storage, Config<T>, Event<T>},
+		Ethereum: eth_module::{Module, Call, Storage, Config, Event, ValidateUnsigned },
+		Evm: pallet_evm::{Module, Call, Storage, Config, Event<T>},
+	}
+);
+
 
 pub struct AccountInfo {
 	pub address: H160,
